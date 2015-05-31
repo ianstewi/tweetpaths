@@ -1,0 +1,40 @@
+/* Uncomment if using Google Analytics
+ga('send', 'pageview', {
+  'page': '/maps/add'
+}); */
+
+positionMap(<%= session[:north] %>, <%= session[:south] %>, <%= session[:east] %>, <%= session[:west] %>);
+
+$('#end_of_controls').before("<%=j render partial: 'user' %>");
+
+initPath();
+
+<% marker_url = image_url("#{@marker_colour[session[:user_number] % 7]}-dot.png")
+shadow_url = image_url('msmarker.shadow.png')
+
+@tweets.each do |tweet|
+  if tweet[:images]
+    marker_url = image_url("#{@marker_colour[session[:user_number] % 7]}-dot-camera.png")
+  else
+    marker_url = image_url("#{@marker_colour[session[:user_number] % 7]}-dot.png")
+  end
+  info_html = render :partial => 'tweet_info', :object => tweet %>
+  addMarker(<%= tweet[:lat] %>, <%= tweet[:lng] %>, "<%=j tweet[:text] %>", "<%=j info_html %>", "<%=j marker_url %>", "<%=j shadow_url %>");
+<% end %>
+
+<% if params[:path] %>
+  addPath("<%=j @marker_rgb[session[:user_number] % 7] %>");
+<% end %>
+
+$('#map_controls_message').html('');
+resetForm('map_user_form');
+enableElement('map_user_submit');
+enableElement('map_reset_button');
+showElement('clear_button');
+focusUser();
+
+<% if @mobile %>
+  hideElement('add_user_form');
+  mobileSizeMap();
+  $('#no_users').html('');
+<% end %>

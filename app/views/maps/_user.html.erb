@@ -1,0 +1,28 @@
+<p class="map_user">
+
+<div class="profile_image">
+  <%= link_to( image_tag(@tweets[0][:profile_image_url], :class => :profile_image), "http://twitter.com/#{@tweets[0][:screen_name]}", :target => '_blank') %>
+</div>
+
+<p class="map_legend_text"><%= link_to "@#{@tweets[0][:screen_name]}", "http://twitter.com/#{@tweets[0][:screen_name]}", { :target => '_blank', :class => :screen_name } %> &bull;
+<%=link_to @tweets[0][:name], "http://twitter.com/#{@tweets[0][:screen_name]}", { :target => '_blank', :class => :user_name } %><br>
+
+<% if @display_from_date %>
+  <%= @display_from_date %>
+<% end %>
+
+<% if (@display_from_date or @display_to_date) and @display_from_date != @display_to_date %>
+-
+<% end %>
+
+<% if @display_to_date and @display_from_date != @display_to_date %>
+  <%= @display_to_date %>
+<% end %>
+
+</p>
+
+<div class="marker_image">
+  <%= image_tag "http://maps.google.com/mapfiles/ms/micons/#{@marker_colour[session[:user_number] % 7]}-dot.png", :class => :marker_image %>
+</div>
+
+</p>

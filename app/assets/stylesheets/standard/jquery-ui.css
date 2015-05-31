@@ -1,0 +1,30 @@
+.ui-datepicker {
+    background-color: white;
+    border: 1px solid #808080;
+    padding: 5px;
+    border-radius: 7px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:80%;
+}
+
+.ui-datepicker .ui-datepicker-header a {
+    padding-right: 7px;
+}
+
+a.ui-state-highlight {
+    font-weight: bold;
+}
+
+img.ui-datepicker-trigger {
+	margin-left: 5px;
+}
+
+a.ui-state-disabled {
+	color:black;
+	cursor:text;
+}
+
+a.ui-state-disabled:hover {
+	text-decoration:none;
+}
+

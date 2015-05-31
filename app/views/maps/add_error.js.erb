@@ -1,0 +1,39 @@
+/* Uncomment if using Google Analytics
+ga('send', 'pageview', {
+  'page': '/maps/add_error'
+}); */
+	  
+<% escaped_error_message = html_escape(@error_message) %>
+	  
+$('#map_controls_message').html('<%=j "<span class=\"error_message\">#{escaped_error_message}</span>".html_safe %>');
+
+enableElement('map_user_submit');
+enableElement('map_reset_button');
+
+<% if @invalid_from_date %>
+  invalidField('from_date_text');
+<% end %>
+
+<% if @invalid_to_date %>
+  invalidField('to_date_text');
+<% end %>
+
+<% if @invalid_user %>
+  invalidField('user');
+<% end %>
+
+<% if @reset_form %>
+  resetForm();
+<% end %>
+
+<% unless @invalid_from_date or @invalid_to_date %>
+  focusUser();
+<% end %>
+
+<% if @this_user %>
+  showElement('twitter_settings');
+<% end %>
+
+<% if @this_user and @mobile %>
+  hideElement('add_user_form');
+<% end %>

@@ -1,0 +1,103 @@
+<noscript>
+  <div class="warning">
+    <p class="bold">Javascript is disabled on your web browser</p>
+	<p>You will need to enable Javascript to be able to use the Tweetpaths map</p>
+  </div>
+</noscript>
+
+<% unless @mobile %>
+  <div id="map_controls">
+<% end %>
+  <div id="add_user_form" class="gradient">
+  <% if @mobile %>
+    <%= image_tag('icon_delete.png', :class => :close_icon, :id => :hide_user_form_button) %>
+    <%= javascript_tag do %>
+      $('#hide_user_form_button').bind('click', function() {hideElement("add_user_form");} );
+    <% end %>
+    <div class="separator"></div>
+  <% end %>
+  
+  <% if @signed_in %>
+  	<%= form_tag url_for( :action => :add ), :id => :map_user_form, :remote => true do %>
+ 		<div class="form-line"><%= label_tag :user, 'Twitter User:', :class => 'form-label' %><%= text_field_tag :user, '', :onfocus => 'clearUser();' %></div>
+    	<div id="show-options" class="link">Show Advanced Options<br></div>
+    	<div id="hide-options" class="link">Hide Advanced Options<br></div>
+    	<div id="options" style="display:none;">
+		<div class="form-line"><%= label_tag :from_date_text, 'Start Date:' %><%= text_field_tag :from_date_text %></div>
+		<div class="form-line"><%= label_tag :to_date_text, 'End Date:' %><%= text_field_tag :to_date_text %></div>
+		<div class="form-line"><%= label_tag :path, 'Show Path' %><%= check_box_tag :path %></div>
+		</div>
+		<%= submit_tag 'Show on Map', :id => :map_user_submit %>
+ 	 <% end %>
+  <% else %>
+  	<div class="form-line"><p class="disabled-form-label">Twitter User:</p><%= text_field_tag :user, '', :disabled => true %></div>
+  	<p class="disabled-show-options">Show Advanced Options</p>
+  	<%= submit_tag 'Show on Map', :disabled => true %>
+  <% end %>
+  
+  <%= javascript_tag do %>
+    $('#map_user_form').bind('ajax:before', function () {
+      document.getElementById("map_controls_message").innerHTML = "<span class=\"progress_message\">Fetching tweets&nbsp;&nbsp;&nbsp;<img src=\"<%= image_url("ajax-loader.gif") %>\" alt=\"\" height=\"16\" width=\"16\"></span>";
+	  disableElement("map_user_submit"); disableElement("map_reset_button");
+	  document.getElementById("from_date_text").style.backgroundColor = "white";
+	  document.getElementById("to_date_text").style.backgroundColor = "white";
+	  document.getElementById("user").style.backgroundColor = "white"; });
+	  
+	$(document).ready(function() {
+	  $.datepicker.setDefaults({ dateFormat: 'd MM yy', showOn: 'button', buttonImage: '<%= image_url ("calendar.gif") %>', buttonImageOnly: true, firstDay: 1, maxDate: 0 });
+      $('#from_date_text').datepicker();
+      $('#to_date_text').datepicker();
+    });
+    
+    $('#show-options').bind('click', function() {showOptions();} );
+    $('#hide-options').bind('click', function() {hideOptions();} );
+  <% end %>
+  
+  <p id="map_controls_message"></p>
+  </div>
+  
+  <div id="map_legend">
+    <% if @mobile %>
+    <%= image_tag('icon_delete.png', :class => :close_icon, :id => :hide_map_legend_button) %>
+    <%= javascript_tag do %>
+      $('#hide_map_legend_button').bind('click', function() {hideElement("map_legend");} );
+    <% end %>
+  <% end %>
+  <% if @mobile %>
+    <p id="no_users">No users have been added to the map</p>
+  <% end %>
+  <span id="end_of_controls"></span>
+  </div>
+  
+  <% unless @mobile %>
+    <div id="clear_button">
+      <%= button_to 'Clear Map', { :action => :reset }, { :id => :map_reset_button } %>
+    </div>
+  <% end %>
+<% unless @mobile %>
+  </div>
+<% end %>
+  
+<div id="map_canvas"></div>
+
+<% if @signed_in %>
+  <div class="popup_box" id="twitter_settings">
+    <h1 class="centered">You have no tweets with locations</h1>
+	<p class="centered">Do you have the Tweet Location feature enabled in Twitter?<br>
+	Go to your <%= link_to 'Twitter Settings', 'http://twitter.com/settings/account', :target => '_black' %>
+	page and tick the "Add a location to your tweets" box.</p>
+	<p class="centered">For more information, see
+	<%= link_to 'About the Tweet Location Feature', 'http://support.twitter.com/forums/26810/entries/78525', :target => '_black' %>
+	in the Twitter help center.</p>
+	<p class="centered"><button onclick="hideElement('twitter_settings');">Close</button></p>
+  </div>
+  
+<% else %>
+  <div class="popup_box" id="signin_message">
+    <p class="bold">Please sign in to start using the Tweetpaths map</p>
+    <%= form_for :session, :url => { :controller => :sessions, :action => :create } do |f| %>
+	  <p class="centered"><%= image_submit_tag('sign-in-with-twitter-gray.png') %></p>
+    <% end %>
+    <p class="centered">See the <%= link_to 'About page', :controller => :homes, :action => :about %> for more information</p>
+  </div>
+<% end %>

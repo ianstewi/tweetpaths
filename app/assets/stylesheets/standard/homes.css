@@ -1,0 +1,21 @@
+div.hometext {
+  width:500px;
+  margin-left:auto;
+  margin-right:auto;
+  padding-bottom:5px;
+  border-bottom:solid black 1px;
+}
+
+p.hometext, h1.hometext, p.faqa {
+  font-size:90%;
+}
+
+h1.hometext {
+  margin-top:30px;
+}
+
+p.faqq {
+  font-size:90%;
+  font-weight:bold;
+  margin-top:30px;
+}

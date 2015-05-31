@@ -1,0 +1,98 @@
+<div id="twitter-follow-button-div"><%= link_to "Follow @#{tweet_info[:screen_name]}", "https://twitter.com/#{tweet_info[:screen_name]}", { :class => 'twitter-follow-button', 'data-show-count' => 'false', 'data-lang' => 'en'} %></div>
+<p id="tweet-header">
+  <%= link_to( image_tag(tweet_info[:profile_image_url], :class => :marker_profile_image), "http://twitter.com/#{tweet_info[:screen_name]}", :target => '_blank' ) %>
+  <%= link_to( tweet_info[:name], "http://twitter.com/#{tweet_info[:screen_name]}", { :target => '_blank', :class => :user_name } ) %> 
+  <%= link_to( "@#{tweet_info[:screen_name]}", "http://twitter.com/#{tweet_info[:screen_name]}", { :target => '_blank', :class => :screen_name } ) %>
+</p>
+<p id="tweet-text">
+  <% tweet_text = auto_link(tweet_info[:text], :all, :target => '_blank').to_str
+  tweet_text.gsub!(/>(http:\/\/t\.co\/[\w\d]+)</) { |match| ">#{tweet_info[:display_urls][$1]}<" }
+  tweet_text.gsub!(/@([\w_]+)/, link_to('@\1', 'http://twitter.com/\1', :target => '_blank'))
+  tweet_text.gsub!(/#([\w_]+)/, link_to('#\1', 'http://twitter.com/#search?q=%23\1', :target => '_blank')) %>
+  <%= tweet_text.html_safe %>
+  <br>
+  <% tweet_time_text = tweet_info[:time].strftime('%a %b %d %H:%M') %>
+  <%= link_to( tweet_time_text, "http://twitter.com/#{tweet_info[:screen_name]}/status/#{tweet_info[:id].to_s}", {:target => '_blank', :class => :tweet_link} ) %>
+</p>
+	
+<% if tweet_info[:images] %>
+  <p class="thumbnail">
+	
+	<% tweet_info[:tweetphotos].each do |id| %>
+	  <%= link_to( image_tag("http://TweetPhotoAPI.com/api/TPAPI.svc/json/imagefromurl?size=thumbnail&url=http://tweetphoto.com/#{id}", :class => :thumbnail, :size => '79x79'), "http://tweetphoto.com/#{id}", :target => '_blank') %>
+	<% end %>
+	
+	<% tweet_info[:plixis].each do |id| %>
+	  <%= link_to( image_tag("http://api.plixi.com/api/TPAPI.svc/json/imagefromurl?size=thumbnail&url=http://plixi.com/p/#{id}", :class => :thumbnail, :size => '79x79'), "http://plixi.com/p/#{id}", :target => '_blank') %>
+	<% end %>
+	
+	<% tweet_info[:lockerz].each do |id| %>
+	  <%= link_to( image_tag("http://api.plixi.com/api/TPAPI.svc/json/imagefromurl?size=thumbnail&url=http://plixi.com/p/#{id}", :class => :thumbnail, :size => '79x79'), "http://lockerz.com/s/#{id}", :target => '_blank') %>
+	<% end %>
+	
+	<% tweet_info [:yfrogs].each do |id| %>
+	  <%= link_to( image_tag("http://yfrog.com/#{id}.th.jpg", :class => :thumbnail), "http://yfrog.com/#{id}", :target => '_blank') %>
+	<% end %>
+	
+	<% tweet_info[:twitpics].each do |id| %>
+	  <%= link_to( image_tag("http://twitpic.com/show/thumb/#{id}", :class => :thumbnail, :size => '150x150'), "http://twitpic.com/#{id}", :target => '_blank') %>
+	<% end %>
+	
+	<% tweet_info[:instagrams].each do |id| %>
+	  <%= link_to( image_tag("http://instagr.am/p/#{id}/media?size=t", :class => :thumbnail, :size => '150x150'), "http://instagr.am/p/#{id}/", :target => '_blank') %>
+	<% end %>
+	
+	<% tweet_info[:media].each do |media| %>
+	  <%= link_to( image_tag("#{media.media_url.to_s}:thumb", :class => :thumbnail, :size => '150x150'), media.expanded_url.to_s, :target => '_blank') %>
+	<% end %>
+	
+  </p>
+<% end %>
+
+<p>
+	<%= link_to image_tag('reply.png'), "https://twitter.com/intent/tweet?in_reply_to=#{tweet_info[:id].to_s}" %>
+	<%= link_to 'Reply', "https://twitter.com/intent/tweet?in_reply_to=#{tweet_info[:id].to_s}", class: :intent %>
+	<%= link_to image_tag('retweet.png'), "https://twitter.com/intent/retweet?tweet_id=#{tweet_info[:id].to_s}" %>
+	<%= link_to 'Retweet', "https://twitter.com/intent/retweet?tweet_id=#{tweet_info[:id].to_s}", class: :intent %>
+	<%= link_to image_tag('favorite.png'), "https://twitter.com/intent/favorite?tweet_id=#{tweet_info[:id].to_s}" %>
+	<%= link_to 'Favorite', "https://twitter.com/intent/favorite?tweet_id=#{tweet_info[:id].to_s}", class: :intent %>
+</p>
+	  
+<% unless tweet_info[:mentioned_users].empty? %>
+  <p class="map_add_links">
+	<% tweet_info[:mentioned_users].each do |user_array| %>
+	  <% user = user_array[0]
+	     link_id = "user#{user}#{tweet_info[:time].to_i}" %>
+	  <%= link_to '', { :action => :add, :user => user }, :id => link_id, :style => 'visibility:hidden;', :method => :post, :remote => true %>
+	  <%= link_to "Add @#{user} to map", '#', :onclick => "document.getElementById('map_controls_message').innerHTML = '<span class=\"progress_message\">Fetching tweets for #{user}&nbsp;&nbsp;&nbsp;<img src=\"assets/ajax-loader.gif\" alt=\"\" height=\"16\" width=\"16\"></span>';
+	    disableElement('map_user_submit'); disableElement('map_reset_button');
+	    fakeClick(document.getElementById('#{link_id}'));" %>
+	  <br>
+	<% end %>
+  </p>
+<% end %>
+  
+<% if tweet_info[:time_diff] %>
+  <p class="last_tweet">Since Last Tweet:<br>Time:
+  <%= Time.at(tweet_info[:time_diff]).utc.strftime('%H:%M:%S') %>
+
+  , Distance:
+<% distance = tweet_info[:distance] %>
+<% if distance < 0.001 %>
+  0
+<% elsif distance < 1.0 %>
+  <%= sprintf '%.0f m', distance * 1000 %>
+<% elsif distance < 10.0 %>
+  <%= sprintf '%.2f km', distance %>
+<% elsif distance < 100.0 %>
+  <%= sprintf '%.1f km', distance %>
+<% else %>
+  <%= sprintf '%.0f km', distance %>
+<% end %>
+	
+  <% if tweet_info[:speed] %>
+    , Avg Speed: <%= tweet_info[:speed] %> km/h
+  <% end %>
+	
+  </p>
+<% end %>
